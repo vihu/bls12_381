@@ -32,6 +32,11 @@ impl ConditionallySelectable for MillerLoopResult {
 }
 
 impl MillerLoopResult {
+    /// Return one as the default value for MillerLoopResult for accumulation purposes.
+    pub fn default() -> Self {
+        MillerLoopResult(Fp12::one())
+    }
+
     /// This performs a "final exponentiation" routine to convert the result
     /// of a Miller loop into an element of `Gt` with help of efficient squaring
     /// operation in the so-called `cyclotomic subgroup` of `Fq6` so that
@@ -173,6 +178,15 @@ impl<'a, 'b> Add<&'b MillerLoopResult> for &'a MillerLoopResult {
     #[inline]
     fn add(self, rhs: &'b MillerLoopResult) -> MillerLoopResult {
         MillerLoopResult(self.0 * rhs.0)
+    }
+}
+
+impl<'a, 'b> Mul<&'b MillerLoopResult> for &'a MillerLoopResult {
+    type Output = MillerLoopResult;
+
+    #[inline]
+    fn mul(self, other: &'b MillerLoopResult) -> Self::Output {
+        MillerLoopResult(self.0 * other.0)
     }
 }
 
