@@ -66,6 +66,8 @@ pub use g2::{G2Affine, G2Projective};
 mod fp12;
 #[cfg(feature = "groups")]
 mod fp6;
+#[cfg(feature = "groups")]
+pub use fp12::Fp12;
 
 // The BLS parameter x for BLS12-381 is -0xd201000000010000
 #[cfg(feature = "groups")]
