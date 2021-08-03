@@ -545,6 +545,12 @@ impl<'a, 'b> Mul<&'b Scalar> for &'a G1Affine {
     }
 }
 
+impl<'a> MulAssign<&'a Scalar> for G1Affine {
+    fn mul_assign(&mut self, rhs: &'a Scalar) {
+        *self = G1Affine::from(&*self * rhs);
+    }
+}
+
 impl_binops_additive!(G1Projective, G1Projective);
 impl_binops_multiplicative!(G1Projective, Scalar);
 impl_binops_multiplicative_mixed!(G1Affine, Scalar, G1Projective);
@@ -1540,6 +1546,15 @@ fn test_mul_by_x() {
 
     let point = G1Projective::generator() * Scalar::from(42);
     assert_eq!(point.mul_by_x(), point * x);
+
+    // test mul_assign works with G1Affine
+    let mut g1 = G1Affine::generator();
+    g1 *= &x;
+    assert_eq!(g1, G1Affine::from(generator * x));
+
+    let mut other_g1 = G1Affine::generator();
+    other_g1 *= &Scalar::from(42);
+    assert_eq!(other_g1, G1Affine::from(point))
 }
 
 #[test]
