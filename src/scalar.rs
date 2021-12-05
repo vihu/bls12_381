@@ -207,6 +207,9 @@ impl Default for Scalar {
     }
 }
 
+#[cfg(feature = "zeroize")]
+impl zeroize::DefaultIsZeroes for Scalar {}
+
 impl Scalar {
     /// Returns zero, the additive identity.
     #[inline]
@@ -679,10 +682,6 @@ impl Field for Scalar {
         Self::one()
     }
 
-    fn is_zero(&self) -> bool {
-        self.ct_eq(&Self::zero()).into()
-    }
-
     #[must_use]
     fn square(&self) -> Self {
         self.square()
@@ -705,21 +704,16 @@ impl Field for Scalar {
 impl PrimeField for Scalar {
     type Repr = [u8; 32];
 
-    fn from_repr(r: Self::Repr) -> Option<Self> {
-        let res = Self::from_bytes(&r);
-        if res.is_some().into() {
-            Some(res.unwrap())
-        } else {
-            None
-        }
+    fn from_repr(r: Self::Repr) -> CtOption<Self> {
+        Self::from_bytes(&r)
     }
 
     fn to_repr(&self) -> Self::Repr {
         self.to_bytes()
     }
 
-    fn is_odd(&self) -> bool {
-        self.to_bytes()[0] & 1 == 1
+    fn is_odd(&self) -> Choice {
+        Choice::from(self.to_bytes()[0] & 1)
     }
 
     const NUM_BITS: u32 = MODULUS_BITS;
@@ -1239,4 +1233,19 @@ fn test_double() {
     ]);
 
     assert_eq!(a.double(), a + a);
+}
+
+#[cfg(feature = "zeroize")]
+#[test]
+fn test_zeroize() {
+    use zeroize::Zeroize;
+
+    let mut a = Scalar::from_raw([
+        0x1fff_3231_233f_fffd,
+        0x4884_b7fa_0003_4802,
+        0x998c_4fef_ecbc_4ff3,
+        0x1824_b159_acc5_0562,
+    ]);
+    a.zeroize();
+    assert!(bool::from(a.is_zero()));
 }

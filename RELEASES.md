@@ -1,3 +1,21 @@
+# 0.6.0
+
+## Fixed
+- `bls12_381::Gt::default()` now returns `Gt::identity()` instead of a nonsensical value.
+
+## Added
+- Zeroization support for most public types, behind the `zeroize` feature flag.
+- `bls12_381::MillerLoopResult` trait implementations:
+  - `Default`
+  - `AddAssign<MillerLoopResult>`
+  - `AddAssign<&MillerLoopResult>`
+
+## Changed
+- Bumped dependencies to `ff 0.11`, `group 0.11`, `pairing 0.21`.
+
+## Removed
+- The deprecated `endo` feature flag.
+
 # 0.5.0
 
 ## Added
